@@ -1,0 +1,7 @@
+# .prettierignore
+.nuxt/
+dist/
+node_modules/
+.output/
+*.min.js
+*.css
