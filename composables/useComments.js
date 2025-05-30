@@ -1,19 +1,15 @@
 
 import { ref } from 'vue';
 
-
-import commentsData from '~/data/comments.json';
+const API_BASE_URL = 'http://localhost:3001';
 
 export const useComments = () => {
-  const getCommentsByPostId = (postId) => {
+  const getCommentsByPostId = async (postId) => {
 
-
-    return new Promise(resolve => {
-      setTimeout(() => {
-        const filteredComments = commentsData.filter(comment => comment.postId === postId);
-        resolve(filteredComments);
-      }, 500); //500 мс
+    const comments = await globalThis.$fetch(`${API_BASE_URL}/comments`, {
+      query: { postId: postId },
     });
+    return comments;
   };
 
   return {

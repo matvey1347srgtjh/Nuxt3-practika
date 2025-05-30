@@ -1,5 +1,5 @@
 <template>
-  <header class="app-footer">
+  <footer class="app-footer">
     <div class="container">
       <NuxtLink to="/" class="app-footer__logo">
         &copy;Тест Блог
@@ -10,7 +10,7 @@
         </ul>
       </nav>
     </div>
-  </header>
+  </footer>
 </template>
 
 <script setup>

@@ -18,7 +18,11 @@
         <img :src="post.image || 'https://via.placeholder.com/800x600/cccccc/ffffff?text=No+Image'" :alt="post.title" class="post-image">
       </div>
       <div class="post-content" v-html="post.content"></div>
-      <NuxtLink to="/posts" class="button button--secondary">← Все посты</NuxtLink>
+      <div class="post-actions">
+        <NuxtLink :to="`/posts/edit/${post.id}`" class="button button--success">Редактировать пост</NuxtLink>
+        <NuxtLink to="/posts" class="button button--secondary">← Все посты</NuxtLink>
+        <button @click="handleDeletePost" class="button button--danger">Удалить пост</button>
+      </div>
 
       <section class="comments-section">
         <h2>Комментарии</h2>
@@ -43,36 +47,61 @@
       <p>Кажется, такого поста не существует.</p>
       <NuxtLink to="/posts" class="button button--success">Вернуться к постам</NuxtLink>
     </div>
+
+    <ConfirmModal
+      ref="confirmModal"
+      title="Удалить пост?"
+      message="Вы уверены, что хотите безвозвратно удалить этот пост? Это действие нельзя отменить."
+      confirm-text="Да, удалить"
+      cancel-text="Нет, отмена"
+    />
   </div>
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { usePosts } from '~/composables/usePosts';
 import { useComments } from '~/composables/useComments';
+import ConfirmModal from '~/components/ConfirmModal.vue';
 
 const route = useRoute();
-const { getPostById } = usePosts();
+const router = useRouter();
+const { getPostById, deletePost } = usePosts();
 const { getCommentsByPostId } = useComments();
 
+const confirmModal = ref(null);
 
 const { data: post, pending: postPending, error: postError, refresh: refreshPost } = await useAsyncData(
-  `post-${route.params.id}`, 
-  () => getPostById(route.params.id) 
+  `post-${route.params.id}`,
+  () => getPostById(route.params.id)
 );
-
 
 const { data: comments, pending: commentsPending, error: commentsError, refresh: refreshComments } = await useLazyAsyncData(
-  `comments-${route.params.id}`, 
+  `comments-${route.params.id}`,
   () => getCommentsByPostId(route.params.id),
-  { watch: [() => route.params.id] } 
+  { watch: [() => route.params.id] }
 );
-
-
 
 const formatDate = (dateString) => {
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
   return new Date(dateString).toLocaleDateString('ru-RU', options);
+};
+
+const handleDeletePost = async () => {
+  const confirmed = await confirmModal.value.open();
+
+  if (confirmed) {
+    try {
+      await deletePost(post.value.id);
+      console.log(`Пост с ID ${post.value.id} успешно удален.`);
+      router.push('/posts');
+    } catch (e) {
+      console.error('Ошибка при удалении поста:', e);
+      alert('Произошла ошибка при удалении поста. Пожалуйста, попробуйте еще раз.');
+    }
+  } else {
+    console.log('Удаление поста отменено.');
+  }
 };
 
 
@@ -83,9 +112,10 @@ useHead(() => ({
   ]
 }));
 
-
-if (post.value === null && !postPending.value && !postError.value) {
-  throw createError({ statusCode: 404, statusMessage: 'Post Not Found', fatal: true })
+if (process.client && post.value === null && !postPending.value && !postError.value) {
+  router.replace('/404');
+} else if (post.value === null && !postPending.value && !postError.value) {
+  throw createError({ statusCode: 404, statusMessage: 'Post Not Found', fatal: true });
 }
 </script>
 
@@ -94,31 +124,84 @@ if (post.value === null && !postPending.value && !postError.value) {
   padding-top: $spacing-xl;
   padding-bottom: $spacing-xl;
 
+  .button--danger {
+    background-color: $danger-color;
+    color: $white-color;
+    border: none;
+    &:hover {
+      background-color: darken($danger-color, 10%);
+    }
+  }
+
   .post-title {
     font-size: $font-size-h1;
     color: $success-color;
     margin-bottom: $spacing-sm;
-    text-align: center;
+    text-align: $center;
   }
 
   .post-date {
     font-size: $font-size-md;
     color: $text-color-light;
     margin-bottom: $spacing-xl;
-    text-align: center;
+    text-align: $center;
   }
 
+  
   .post-image-wrapper {
-    width: 100%;
+    width: 100%; 
     margin-bottom: $spacing-xl;
-    text-align: center;
+    text-align: $center;
+
+ 
+
   }
+
 
   .post-image {
     max-width: 100%;
     height: auto;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+@media (max-width: 500px) {
+ .post-image-wrapper {
+    max-width: 400px; 
+    margin-bottom: $spacing-xl;
+    text-align: $center;
+  }
+
+
+  .post-image {
+    max-width: 400px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+  .post-actions {
+    display: flex;
+    justify-content: center;
+    gap: $spacing-md;
+    margin-top: $spacing-xl;
+    margin-bottom: $spacing-xxl;
+
+    .button {
+      margin-top: 0;
+    }
+
+    @media (max-width: 480px) {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
   }
 
   .post-content {
@@ -126,7 +209,7 @@ if (post.value === null && !postPending.value && !postError.value) {
     line-height: $line-height-base;
     color: $text-color;
     margin-bottom: $spacing-xxl;
-    max-width: 800px; 
+    max-width: 800px;
     margin-left: auto;
     margin-right: auto;
 
@@ -161,7 +244,7 @@ if (post.value === null && !postPending.value && !postError.value) {
     }
     code {
       font-family: 'Courier New', Courier, monospace;
-      background-color: #eee;
+      background-color: $background-color;
       padding: 2px 4px;
       border-radius: 3px;
     }
@@ -180,14 +263,14 @@ if (post.value === null && !postPending.value && !postError.value) {
 
     &--success {
       background-color: $success-color;
-      color: white;
+      color: $white-color;
       &:hover {
         background-color: darken($success-color, 10%);
       }
     }
     &--secondary {
       background-color: $secondary-color;
-      color: white;
+      color: $white-color;
       &:hover {
         background-color: darken($secondary-color, 10%);
       }
@@ -195,7 +278,7 @@ if (post.value === null && !postPending.value && !postError.value) {
   }
 
   .post-not-found, .loading-state, .error-state {
-    text-align: center;
+    text-align: $center;
     padding: $spacing-xxl;
     .error-title {
       color: $danger-color;
@@ -208,21 +291,20 @@ if (post.value === null && !postPending.value && !postError.value) {
     }
   }
 
-
   .comments-section {
     margin-top: $spacing-xxl;
     padding-top: $spacing-xxl;
-    border-top: 1px solid #eee; 
+    border-top: 1px solid #eee;
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
-    text-align: left; 
+    text-align: left;
 
     h2 {
       font-size: $font-size-h2;
-      color: $success-color; 
+      color: $success-color;
       margin-bottom: $spacing-xl;
-      text-align: center;
+      text-align: $center;
     }
 
     .comments-list {
@@ -231,7 +313,7 @@ if (post.value === null && !postPending.value && !postError.value) {
     }
 
     .comment-item {
-      background-color: lighten($background-color, 2%); 
+      background-color: lighten($background-color, 2%);
       border-radius: 8px;
       padding: $spacing-lg;
       margin-bottom: $spacing-md;
@@ -259,7 +341,7 @@ if (post.value === null && !postPending.value && !postError.value) {
     }
 
     .no-comments {
-      text-align: center;
+      text-align: $center;
       color: $text-color-light;
       font-style: italic;
       padding: $spacing-md;

@@ -42,7 +42,7 @@ useHead({
 
 .page-title{
     color: $success-color;
-    text-align: center;
+    text-align: $center;
     margin-bottom: 30px;
     font-size: $font-size-h1;
 }

@@ -2,10 +2,11 @@
   <div id="app-root">
     <AppHeader /> <NuxtLayout>
       <NuxtPage /> </NuxtLayout>
+      <AppFooter /> 
   </div>
-
-  <AppFooter /> <NuxtLayout>
-     </NuxtLayout>
+      
+    
+  
   
 </template>
 
@@ -59,5 +60,12 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
+}
+
+@media (max-width: 480px) {
+  .container {
+    max-width: 430px;
+
+}
 }
 </style>

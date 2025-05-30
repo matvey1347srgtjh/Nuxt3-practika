@@ -24,12 +24,16 @@ export default defineNuxtConfig({
             $warning-color: #FFC107;
             $danger-color: #e74c3c;
             $success-color: #2ecc71;
+            $white-color: #ffffff;
+            $black-color: #000000;
+            $border-color: #000000;
             $success-light-color:rgb(116, 216, 158);
            
 
             $text-color: #333333;      
             $text-color-light: #666666; 
             $background-color: #f8f8f8; 
+            $center: center;
 
             // Шрифты
             $font-stack: 'Roboto', sans-serif;

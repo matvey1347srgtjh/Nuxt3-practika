@@ -2,7 +2,14 @@
   <div class="container page-home">
     <h1 class="page-title">Последние посты</h1>
 
-    <div v-if="latestPosts.length" class="post-grid">
+    <div v-if="pending" class="loading-state">
+      <p>Загрузка последних постов...</p>
+    </div>
+    <div v-else-if="error" class="error-state">
+      <p>Ошибка загрузки постов: {{ error.message }}</p>
+      <button @click="refresh" class="button button--success">Повторить загрузку</button>
+    </div>
+    <div v-else-if="latestPosts.length" class="post-grid">
       <PostCard v-for="post in latestPosts" :key="post.id" :post="post" />
     </div>
     <p v-else>Нет доступных постов.</p>
@@ -14,18 +21,21 @@
 </template>
 
 <script setup>
-import { usePosts } from '~/composables/usePosts'; 
+import { usePosts } from '~/composables/usePosts';
 import { computed } from 'vue';
 
-
 const { getAllPosts } = usePosts();
-const allPosts = getAllPosts(); 
+
+
+const { data: allPostsData, pending, error, refresh } = await useAsyncData(
+  'all-posts-home',
+  () => getAllPosts() 
+);
 
 
 const latestPosts = computed(() => {
-  return allPosts.slice(0, 3);
+  return allPostsData.value?.posts?.slice(0, 3) || [];
 });
-
 
 useHead({
   title: 'Главная страница - Тест Блог',
@@ -36,33 +46,34 @@ useHead({
 </script>
 
 <style lang="scss" scoped>
+
 .page-home {
   padding-top: $spacing-xl;
   padding-bottom: $spacing-xl;
-  text-align: center; 
+  text-align: center;
 
   .page-title {
     color: $success-color;
     font-size: $font-size-h1;
-    margin-bottom: $spacing-xxl; 
+    margin-bottom: $spacing-xxl;
   }
 
-
-  .post-grid {
-  display: grid;
-  gap: $spacing-xl; 
-  grid-template-columns: repeat(3, 1fr);
-  margin-bottom: $spacing-xxl; 
-  }
-
-@media (max-width: 768px) {
   .post-grid {
     display: grid;
-    gap: $spacing-xl; 
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-    margin-bottom: $spacing-xxl; 
+    gap: $spacing-xl;
+    grid-template-columns: repeat(3, 1fr);
+    margin-bottom: $spacing-xxl;
   }
-}
+
+  @media (max-width: 768px) {
+    .post-grid {
+      display: grid;
+      gap: $spacing-xl;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      margin-bottom: $spacing-xxl;
+    }
+  }
+
   .all-posts-link-wrapper {
     margin-top: $spacing-xl;
   }
@@ -84,6 +95,15 @@ useHead({
         background-color: darken($success-color, 10%);
       }
     }
+  }
+
+  .loading-state, .error-state {
+    padding: $spacing-md;
+    font-size: $font-size-lg;
+    color: $text-color-light;
+  }
+  .error-state {
+    color: $danger-color;
   }
 }
 </style>
