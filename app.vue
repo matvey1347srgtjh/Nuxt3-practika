@@ -2,9 +2,9 @@
   <div id="app-root">
     <AppHeader /> <NuxtLayout>
       <NuxtPage /> </NuxtLayout>
-      <AppFooter /> 
+           
   </div>
-      
+ <AppFooter /> 
     
   
   

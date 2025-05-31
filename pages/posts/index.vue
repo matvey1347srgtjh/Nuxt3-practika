@@ -60,7 +60,6 @@ const router = useRouter();
 const postsPerPage = 6;
 const currentPage = ref(parseInt(route.query.page) || 1);
 
-// Ваш существующий useAsyncData ...
 const {
   data: paginatedData,
   pending,
@@ -73,27 +72,23 @@ const {
     watch: [currentPage],
     debounce: 300,
     transform: (data) => {
-        console.log('Данные paginatedData.value после transform:', data);
-        return data;
+      return data;
     }
   }
 );
 
 const currentPosts = computed(() => {
-    const posts = paginatedData.value?.posts || [];
-    console.log('currentPosts (computed):', posts.length);
-    return posts;
+  const posts = paginatedData.value?.posts || [];
+  return posts;
 });
 const totalPosts = computed(() => {
-    const count = paginatedData.value?.totalCount || 0;
-    console.log('totalPosts (computed):', count);
-    return count;
+  const count = paginatedData.value?.totalCount || 0;
+  return count;
 });
 
 const totalPages = computed(() => {
-    const pages = Math.ceil(totalPosts.value / postsPerPage);
-    console.log('totalPages (computed):', pages);
-    return pages;
+  const pages = Math.ceil(totalPosts.value / postsPerPage);
+  return pages;
 });
 
 
@@ -122,13 +117,6 @@ watch(() => route.query.page, (newPage) => {
   }
 });
 
-console.log('Состояние v-if для пагинации (финальное):', {
-  totalPages: totalPages.value,
-  pending: pending.value,
-  error: error.value,
-  conditionResult: totalPages.value > 1 && !pending.value && !error.value
-});
-
 useHead({
   title: 'Все посты - Тест Блог',
   meta: [
@@ -136,6 +124,7 @@ useHead({
   ]
 });
 </script>
+
 
 <style lang="scss" scoped>
 

@@ -24,7 +24,7 @@ export const usePosts = () => {
       const post = await globalThis.$fetch(`${API_BASE_URL}/posts/${id}`);
       return post;
     } catch (e) {
-      // Оставим console.error
+
       console.error(`Failed to fetch post with ID ${id}:`, e);
       return null;
     }

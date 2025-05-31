@@ -168,24 +168,6 @@ if (process.client && post.value === null && !postPending.value && !postError.va
     margin-right: auto;
   }
 
-@media (max-width: 500px) {
- .post-image-wrapper {
-    max-width: 400px; 
-    margin-bottom: $spacing-xl;
-    text-align: $center;
-  }
-
-
-  .post-image {
-    max-width: 400px;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
 
   .post-actions {
     display: flex;
