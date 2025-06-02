@@ -21,7 +21,7 @@
 
 .app-footer {
   background-color: $success-color; 
-  color: white;
+  color: $white-color;
   padding: 1rem 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
  
@@ -37,7 +37,7 @@
   }
 
   &__logo {
-    color: white;
+    color: $white-color;
     text-decoration: none;
     font-weight: bold;
     font-size: 1.5rem;
@@ -61,7 +61,7 @@
     }
 
     p {
-      color: white;
+      color: $white-color;
       text-decoration: none;
       font-weight: 500;
       transition: opacity 0.2s ease-in-out;

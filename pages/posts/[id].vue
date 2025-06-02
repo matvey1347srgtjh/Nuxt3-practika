@@ -115,7 +115,7 @@ useHead(() => ({
 if (process.client && post.value === null && !postPending.value && !postError.value) {
   router.replace('/404');
 } else if (post.value === null && !postPending.value && !postError.value) {
-  throw createError({ statusCode: 404, statusMessage: 'Post Not Found', fatal: true });
+  throw createError({ statusCode: 404, statusMessage: 'Пост не найден', fatal: true });
 }
 </script>
 

@@ -90,7 +90,7 @@ useHead({
 
     &--success {
       background-color: $success-color;
-      color: white;
+      color: $white-color;
       &:hover {
         background-color: darken($success-color, 10%);
       }

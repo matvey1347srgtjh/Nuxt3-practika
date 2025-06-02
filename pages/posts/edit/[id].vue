@@ -72,38 +72,37 @@ const form = reactive({
   image: '',
   excerpt: '',
   content: '',
-  date: '' // Дата будет обновляться при сохранении
+  date: ''
 });
 
-// Загружаем данные поста
+
 const { data: post, pending: postPending, error: postError, refresh: refreshPost } = await useAsyncData(
   `edit-post-${postId}`,
   () => getPostById(postId)
 );
 
-// Watcher для заполнения формы данными поста после загрузки
+
 watch(post, (newPost) => {
   if (newPost) {
     form.title = newPost.title;
     form.image = newPost.image;
     form.excerpt = newPost.excerpt;
     form.content = newPost.content;
-    form.date = newPost.date; // Сохраняем исходную дату
+    form.date = newPost.date;
   }
-}, { immediate: true }); // immediate: true - чтобы выполнить watcher сразу после инициализации
+}, { immediate: true });
 
 const submitPost = async () => {
   isSubmitting.value = true;
   try {
-    // Создаем новый объект с данными для обновления
     const updatedData = {
-      ...form, // Берем все данные из формы
-      date: new Date().toISOString() // Обновляем дату на текущую при редактировании
+      ...form,
+      date: new Date().toISOString() 
     };
 
     await updatePost(postId, updatedData);
     console.log('Пост успешно обновлен!');
-    router.push(`/posts/${postId}`); // Перенаправляем обратно на страницу поста
+    router.push(`/posts/${postId}`);
   } catch (error) {
     console.error('Ошибка при обновлении поста:', error);
     alert('Произошла ошибка при сохранении изменений. Пожалуйста, попробуйте еще раз.');
@@ -120,11 +119,11 @@ useHead(() => ({
   ]
 }));
 
-// Если пост не найден на клиенте после загрузки данных
+
 if (process.client && post.value === null && !postPending.value && !postError.value) {
   router.replace('/404');
 } else if (post.value === null && !postPending.value && !postError.value) {
-  // На сервере выбрасываем ошибку для Nuxt для обработки 404
+
   throw createError({ statusCode: 404, statusMessage: 'Post Not Found', fatal: true });
 }
 </script>

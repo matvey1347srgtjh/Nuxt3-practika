@@ -84,7 +84,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .app-header {
   background-color: $success-color; 
-  color: white;
+  color: $white-color;
   padding: 1rem 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: relative;
@@ -102,7 +102,7 @@ onMounted(() => {
   }
 
   &__logo {
-    color: white;
+    color: $white-color;
     text-decoration: none;
     font-weight: bold;
     font-size: 1.5rem;
@@ -176,7 +176,7 @@ onMounted(() => {
     }
 
     a {
-      color: white;
+      color: $white-color;
       text-decoration: none;
       font-weight: 500;
       display: inline-block;
