@@ -120,7 +120,7 @@ const handleAddComment = () => {
 const handleDeletePost = async () => {
   if (!post.value) {
     console.warn(
-      'handleDeletePost: Пост еще не загружен, модальное окно удаления не будет открыто.'
+      'Пост еще не загружен.'
     );
     return;
   }
