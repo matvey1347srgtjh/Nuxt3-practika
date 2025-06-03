@@ -15,11 +15,17 @@
       <h1 class="post-title">{{ post.title }}</h1>
       <p class="post-date">{{ formatDate(post.date) }}</p>
       <div class="post-image-wrapper">
-        <img :src="post.image || 'https://via.placeholder.com/800x600/cccccc/ffffff?text=No+Image'" :alt="post.title" class="post-image">
+        <img
+          :src="post.image || 'https://via.placeholder.com/800x600/cccccc/ffffff?text=No+Image'"
+          :alt="post.title"
+          class="post-image"
+        />
       </div>
       <div class="post-content" v-html="post.content"></div>
       <div class="post-actions">
-        <NuxtLink :to="`/posts/edit/${post.id}`" class="button button--success">Редактировать пост</NuxtLink>
+        <NuxtLink :to="`/posts/edit/${post.id}`" class="button button--success"
+          >Редактировать пост</NuxtLink
+        >
         <NuxtLink to="/posts" class="button button--secondary">← Все посты</NuxtLink>
         <button @click="handleDeletePost" class="button button--danger">Удалить пост</button>
       </div>
@@ -30,15 +36,25 @@
           <p>Загрузка комментариев...</p>
         </div>
         <div v-else-if="commentsError" class="error-state">
-          <p>Не удалось загрузить комментарии. <button @click="refreshComments">Повторить</button></p>
+          <p>
+            Не удалось загрузить комментарии. <button @click="refreshComments">Повторить</button>
+          </p>
         </div>
         <ul v-else-if="comments && comments.length" class="comments-list">
           <li v-for="comment in comments" :key="comment.id" class="comment-item">
-            <p class="comment-author">{{ comment.author }} <span class="comment-date">{{ formatDate(comment.date) }}</span></p>
+            <p class="comment-author">
+              {{ comment.author }} <span class="comment-date">{{ formatDate(comment.date) }}</span>
+            </p>
             <p class="comment-text">{{ comment.text }}</p>
           </li>
         </ul>
         <p v-else class="no-comments">Пока нет комментариев. Будьте первым!</p>
+
+        <div class="add-comment-action">
+          <button @click="handleAddComment" class="button button--outline">
+            Написать комментарий
+          </button>
+        </div>
       </section>
     </div>
 
@@ -47,36 +63,33 @@
       <p>Кажется, такого поста не существует.</p>
       <NuxtLink to="/posts" class="button button--success">Вернуться к постам</NuxtLink>
     </div>
-
-    <ConfirmModal
-      ref="confirmModal"
-      title="Удалить пост?"
-      message="Вы уверены, что хотите безвозвратно удалить этот пост? Это действие нельзя отменить."
-      confirm-text="Да, удалить"
-      cancel-text="Нет, отмена"
-    />
   </div>
 </template>
 
 <script setup>
-import { useRoute, useRouter } from 'vue-router';
 import { usePosts } from '~/composables/usePosts';
 import { useComments } from '~/composables/useComments';
-import ConfirmModal from '~/components/ConfirmModal.vue';
+import { useModalStore } from '@/stores/modal';
 
 const route = useRoute();
 const router = useRouter();
 const { getPostById, deletePost } = usePosts();
 const { getCommentsByPostId } = useComments();
+const modalStore = useModalStore();
 
-const confirmModal = ref(null);
+const {
+  data: post,
+  pending: postPending,
+  error: postError,
+  refresh: refreshPost
+} = await useAsyncData(`post-${route.params.id}`, () => getPostById(route.params.id));
 
-const { data: post, pending: postPending, error: postError, refresh: refreshPost } = await useAsyncData(
-  `post-${route.params.id}`,
-  () => getPostById(route.params.id)
-);
-
-const { data: comments, pending: commentsPending, error: commentsError, refresh: refreshComments } = await useLazyAsyncData(
+const {
+  data: comments,
+  pending: commentsPending,
+  error: commentsError,
+  refresh: refreshComments
+} = await useLazyAsyncData(
   `comments-${route.params.id}`,
   () => getCommentsByPostId(route.params.id),
   { watch: [() => route.params.id] }
@@ -87,28 +100,56 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('ru-RU', options);
 };
 
-const handleDeletePost = async () => {
-  const confirmed = await confirmModal.value.open();
-
-  if (confirmed) {
-    try {
-      await deletePost(post.value.id);
-      console.log(`Пост с ID ${post.value.id} успешно удален.`);
-      router.push('/posts');
-    } catch (e) {
-      console.error('Ошибка при удалении поста:', e);
-      alert('Произошла ошибка при удалении поста. Пожалуйста, попробуйте еще раз.');
-    }
-  } else {
-    console.log('Удаление поста отменено.');
+const handleAddComment = () => {
+  if (!post.value) {
+    return;
   }
+
+  modalStore.openModal(
+    defineAsyncComponent(() => import('~/components/modals/CommentFormModal.vue')),
+    {
+      postId: post.value.id,
+      onCommentCreated: () => {
+        refreshComments();
+      }
+    },
+    'Написать новый комментарий'
+  );
 };
 
+const handleDeletePost = async () => {
+  if (!post.value) {
+    console.warn(
+      'handleDeletePost: Пост еще не загружен, модальное окно удаления не будет открыто.'
+    );
+    return;
+  }
+
+  modalStore.openModal(
+    defineAsyncComponent(() => import('@/components/modals/DeleteModal.vue')),
+    {
+      message: `Вы уверены, что хотите безвозвратно удалить пост "${post.value.title}"? <b>Это действие нельзя отменить.</b>`,
+      onConfirm: async () => {
+        try {
+          await deletePost(post.value.id);
+          console.log(`Пост с ID ${post.value.id} успешно удален.`);
+          router.push('/posts');
+        } catch (e) {
+          alert('Произошла ошибка при удалении поста. Пожалуйста, попробуйте еще раз.');
+        }
+      }
+    },
+    'Подтверждение удаления'
+  );
+};
 
 useHead(() => ({
   title: post.value ? `${post.value.title} - Тест Блог` : 'Загрузка поста...',
   meta: [
-    { name: 'description', content: post.value ? post.value.excerpt : 'Загрузка информации о посте.' }
+    {
+      name: 'description',
+      content: post.value ? post.value.excerpt : 'Загрузка информации о посте.'
+    }
   ]
 }));
 
@@ -124,15 +165,6 @@ if (process.client && post.value === null && !postPending.value && !postError.va
   padding-top: $spacing-xl;
   padding-bottom: $spacing-xl;
 
-  .button--danger {
-    background-color: $danger-color;
-    color: $white-color;
-    border: none;
-    &:hover {
-      background-color: darken($danger-color, 10%);
-    }
-  }
-
   .post-title {
     font-size: $font-size-h1;
     color: $success-color;
@@ -147,16 +179,11 @@ if (process.client && post.value === null && !postPending.value && !postError.va
     text-align: $center;
   }
 
-  
   .post-image-wrapper {
-    width: 100%; 
+    width: 100%;
     margin-bottom: $spacing-xl;
     text-align: $center;
-
- 
-
   }
-
 
   .post-image {
     max-width: 100%;
@@ -167,7 +194,6 @@ if (process.client && post.value === null && !postPending.value && !postError.va
     margin-left: auto;
     margin-right: auto;
   }
-
 
   .post-actions {
     display: flex;
@@ -210,7 +236,8 @@ if (process.client && post.value === null && !postPending.value && !postError.va
     p {
       margin-bottom: $spacing-md;
     }
-    ul, ol {
+    ul,
+    ol {
       margin-left: $spacing-xl;
       margin-bottom: $spacing-md;
     }
@@ -246,6 +273,7 @@ if (process.client && post.value === null && !postPending.value && !postError.va
     &--success {
       background-color: $success-color;
       color: $white-color;
+      cursor: pointer;
       &:hover {
         background-color: darken($success-color, 10%);
       }
@@ -253,13 +281,25 @@ if (process.client && post.value === null && !postPending.value && !postError.va
     &--secondary {
       background-color: $secondary-color;
       color: $white-color;
+      cursor: pointer;
       &:hover {
         background-color: darken($secondary-color, 10%);
       }
     }
+    &--danger {
+      background-color: $danger-color;
+      color: $white-color;
+      border: none;
+      cursor: pointer;
+      &:hover {
+        background-color: darken($danger-color, 10%);
+      }
+    }
   }
 
-  .post-not-found, .loading-state, .error-state {
+  .post-not-found,
+  .loading-state,
+  .error-state {
     text-align: $center;
     padding: $spacing-xxl;
     .error-title {
@@ -328,6 +368,23 @@ if (process.client && post.value === null && !postPending.value && !postError.va
       font-style: italic;
       padding: $spacing-md;
     }
+  }
+}
+
+@media (max-width: 768px) {
+  .add-comment-action {
+    text-align: center;
+  }
+}
+
+
+.button--outline {
+  color: $success-color;
+  border: 1px solid $success-color;
+  background-color: transparent;
+  &:hover {
+    background-color: $success-color;
+    color: $white-color;
   }
 }
 </style>

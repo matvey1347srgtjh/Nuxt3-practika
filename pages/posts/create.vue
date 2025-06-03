@@ -5,7 +5,7 @@
     <form @submit.prevent="createPostHandler" class="post-form">
       <div class="form-group">
         <label for="title">Заголовок поста:</label>
-        <input type="text" id="title" v-model="post.title" required>
+        <input type="text" id="title" v-model="post.title" required />
       </div>
 
       <div class="form-group">
@@ -20,7 +20,7 @@
 
       <div class="form-group">
         <label for="image">URL изображения:</label>
-        <input type="url" id="image" v-model="post.image">
+        <input type="url" id="image" v-model="post.image" />
       </div>
 
       <div class="form-actions">
@@ -38,13 +38,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import { usePosts } from '~/composables/usePosts';
-import { useRouter } from 'vue-router';
 
 const { createPost } = usePosts();
 const router = useRouter();
-
 
 const post = ref({
   title: '',
@@ -53,7 +50,6 @@ const post = ref({
   image: '',
   date: new Date().toISOString().split('T')[0]
 });
-
 
 const creatingPost = ref(false);
 const createError = ref(null);
@@ -65,9 +61,8 @@ const createPostHandler = async () => {
   try {
     const newPost = await createPost(post.value);
     console.log('Пост успешно создан:', newPost);
- 
-    await router.push(`/posts/${newPost.id}`);
 
+    await router.push(`/posts/${newPost.id}`);
   } catch (e) {
     console.error('Ошибка при создании поста:', e);
     createError.value = e;
@@ -76,12 +71,9 @@ const createPostHandler = async () => {
   }
 };
 
-
 useHead({
   title: 'Создать новый пост - Тест Блог',
-  meta: [
-    { name: 'description', content: 'Страница для создания новой записи в блоге.' }
-  ]
+  meta: [{ name: 'description', content: 'Страница для создания новой записи в блоге.' }]
 });
 </script>
 
@@ -116,8 +108,8 @@ useHead({
         color: $text-color;
       }
 
-      input[type="text"],
-      input[type="url"],
+      input[type='text'],
+      input[type='url'],
       textarea {
         width: 100%;
         padding: $spacing-md;
@@ -144,7 +136,7 @@ useHead({
       gap: $spacing-md;
       justify-content: flex-end;
       margin-top: $spacing-xl;
-      
+
       .button {
         padding: $spacing-md $spacing-lg;
         border-radius: 8px;
@@ -168,7 +160,7 @@ useHead({
           }
         }
         &--secondary {
-          background-color: $secondary-color; 
+          background-color: $secondary-color;
           color: $white-color;
           &:hover {
             background-color: darken($secondary-color, 10%);

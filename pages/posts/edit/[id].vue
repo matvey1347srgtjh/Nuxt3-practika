@@ -17,14 +17,14 @@
       <form @submit.prevent="submitPost">
         <div class="form-group">
           <label for="title">Заголовок:</label>
-          <input type="text" id="title" v-model="form.title" required>
+          <input type="text" id="title" v-model="form.title" required />
         </div>
 
         <div class="form-group">
           <label for="image">URL изображения:</label>
-          <input type="url" id="image" v-model="form.image">
+          <input type="url" id="image" v-model="form.image" />
           <div v-if="form.image" class="image-preview">
-            <img :src="form.image" alt="Предпросмотр изображения">
+            <img :src="form.image" alt="Предпросмотр изображения" />
           </div>
         </div>
 
@@ -56,8 +56,6 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
 import { usePosts } from '~/composables/usePosts';
 
 const route = useRoute();
@@ -75,29 +73,33 @@ const form = reactive({
   date: ''
 });
 
+const {
+  data: post,
+  pending: postPending,
+  error: postError,
+  refresh: refreshPost
+} = await useAsyncData(`edit-post-${postId}`, () => getPostById(postId));
 
-const { data: post, pending: postPending, error: postError, refresh: refreshPost } = await useAsyncData(
-  `edit-post-${postId}`,
-  () => getPostById(postId)
+watch(
+  post,
+  (newPost) => {
+    if (newPost) {
+      form.title = newPost.title;
+      form.image = newPost.image;
+      form.excerpt = newPost.excerpt;
+      form.content = newPost.content;
+      form.date = newPost.date;
+    }
+  },
+  { immediate: true }
 );
-
-
-watch(post, (newPost) => {
-  if (newPost) {
-    form.title = newPost.title;
-    form.image = newPost.image;
-    form.excerpt = newPost.excerpt;
-    form.content = newPost.content;
-    form.date = newPost.date;
-  }
-}, { immediate: true });
 
 const submitPost = async () => {
   isSubmitting.value = true;
   try {
     const updatedData = {
       ...form,
-      date: new Date().toISOString() 
+      date: new Date().toISOString()
     };
 
     await updatePost(postId, updatedData);
@@ -111,7 +113,6 @@ const submitPost = async () => {
   }
 };
 
-// Мета-теги для страницы
 useHead(() => ({
   title: post.value ? `Редактировать "${post.value.title}"` : 'Редактировать пост...',
   meta: [
@@ -119,11 +120,9 @@ useHead(() => ({
   ]
 }));
 
-
 if (process.client && post.value === null && !postPending.value && !postError.value) {
   router.replace('/404');
 } else if (post.value === null && !postPending.value && !postError.value) {
-
   throw createError({ statusCode: 404, statusMessage: 'Post Not Found', fatal: true });
 }
 </script>
@@ -154,8 +153,8 @@ if (process.client && post.value === null && !postPending.value && !postError.va
       color: $text-color;
     }
 
-    input[type="text"],
-    input[type="url"],
+    input[type='text'],
+    input[type='url'],
     textarea {
       width: 100%;
       padding: $spacing-sm;
@@ -229,7 +228,9 @@ if (process.client && post.value === null && !postPending.value && !postError.va
     }
   }
 
-  .loading-state, .error-state, .post-not-found {
+  .loading-state,
+  .error-state,
+  .post-not-found {
     text-align: center;
     padding: $spacing-xxl;
     .error-title {

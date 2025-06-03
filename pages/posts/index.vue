@@ -3,7 +3,9 @@
     <h1 class="page-title">Все посты</h1>
 
     <div class="actions-top">
-      <NuxtLink to="/posts/create" class="button button--success-light">Создать новый пост</NuxtLink>
+      <NuxtLink to="/posts/create" class="button button--success-light"
+        >Создать новый пост</NuxtLink
+      >
     </div>
 
     <div v-if="pending" class="loading-state">
@@ -14,7 +16,10 @@
       <button @click="refresh" class="button button--success-light">Повторить загрузку</button>
     </div>
     <div v-else-if="currentPosts && currentPosts.length" class="post-grid">
-      <PostCard v-for="post in currentPosts" :key="post.id" :post="post"
+      <PostCard
+        v-for="post in currentPosts"
+        :key="post.id"
+        :post="post"
         :isLastSingleCard="currentPage === totalPages && currentPosts.length === 1"
       />
     </div>
@@ -26,13 +31,14 @@
         :disabled="currentPage === 1"
         class="button pagination-button"
       >
-        &larr; </button>
+        &larr;
+      </button>
 
       <button
         v-for="pageNumber in pageNumbers"
         :key="pageNumber"
         @click="goToPage(pageNumber)"
-        :class="{ 'pagination-button': true, 'active': pageNumber === currentPage }"
+        :class="{ 'pagination-button': true, active: pageNumber === currentPage }"
         class="button"
       >
         {{ pageNumber }}
@@ -43,15 +49,14 @@
         :disabled="currentPage === totalPages"
         class="button pagination-button"
       >
-        &rarr; </button>
+        &rarr;
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
 import { usePosts } from '~/composables/usePosts';
-import { useRoute, useRouter } from 'vue-router';
 
 const { getAllPosts } = usePosts();
 const route = useRoute();
@@ -91,7 +96,6 @@ const totalPages = computed(() => {
   return pages;
 });
 
-
 const pageNumbers = computed(() => {
   const pages = [];
   for (let i = 1; i <= totalPages.value; i++) {
@@ -107,28 +111,31 @@ const goToPage = (page) => {
   }
 };
 
-watch(() => route.query.page, (newPage) => {
-  const pageNum = parseInt(newPage);
-  if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages.value && pageNum !== currentPage.value) {
-    currentPage.value = pageNum;
-  } else if (isNaN(pageNum) || pageNum < 1) {
-    currentPage.value = 1;
-    router.replace({ query: { page: 1 } });
+watch(
+  () => route.query.page,
+  (newPage) => {
+    const pageNum = parseInt(newPage);
+    if (
+      !isNaN(pageNum) &&
+      pageNum >= 1 &&
+      pageNum <= totalPages.value &&
+      pageNum !== currentPage.value
+    ) {
+      currentPage.value = pageNum;
+    } else if (isNaN(pageNum) || pageNum < 1) {
+      currentPage.value = 1;
+      router.replace({ query: { page: 1 } });
+    }
   }
-});
+);
 
 useHead({
   title: 'Все посты - Тест Блог',
-  meta: [
-    { name: 'description', content: 'Просмотрите полный список всех записей в блоге.' }
-  ]
+  meta: [{ name: 'description', content: 'Просмотрите полный список всех записей в блоге.' }]
 });
 </script>
 
-
 <style lang="scss" scoped>
-
-
 .center {
   text-align: center;
 }
@@ -160,7 +167,8 @@ useHead({
     }
   }
 
-  .loading-state, .error-state {
+  .loading-state,
+  .error-state {
     padding: $spacing-md;
     font-size: $font-size-lg;
     color: $text-color-light;
@@ -188,7 +196,7 @@ useHead({
     }
 
     &.pagination-button {
-      background-color: $success-color ;
+      background-color: $success-color;
       color: $white-color;
       &:hover {
         background-color: darken($success-color, 10%);
@@ -199,13 +207,11 @@ useHead({
       }
     }
 
-
     &.pagination-button.active {
       background-color: darken($success-color, 15%);
       cursor: default;
     }
   }
-
 
   .pagination-controls {
     display: flex;
@@ -215,8 +221,6 @@ useHead({
     margin-top: $spacing-xxl;
     padding: $spacing-md;
     background-color: transparent;
-
-
   }
 }
 </style>

@@ -22,16 +22,15 @@
 
 <script setup>
 import { usePosts } from '~/composables/usePosts';
-import { computed } from 'vue';
 
 const { getAllPosts } = usePosts();
 
-
-const { data: allPostsData, pending, error, refresh } = await useAsyncData(
-  'all-posts-home',
-  () => getAllPosts() 
-);
-
+const {
+  data: allPostsData,
+  pending,
+  error,
+  refresh
+} = await useAsyncData('all-posts-home', () => getAllPosts());
 
 const latestPosts = computed(() => {
   return allPostsData.value?.posts?.slice(0, 3) || [];
@@ -46,7 +45,6 @@ useHead({
 </script>
 
 <style lang="scss" scoped>
-
 .page-home {
   padding-top: $spacing-xl;
   padding-bottom: $spacing-xl;
@@ -97,7 +95,8 @@ useHead({
     }
   }
 
-  .loading-state, .error-state {
+  .loading-state,
+  .error-state {
     padding: $spacing-md;
     font-size: $font-size-lg;
     color: $text-color-light;

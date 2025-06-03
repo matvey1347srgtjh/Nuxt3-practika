@@ -1,13 +1,13 @@
-import { ref } from 'vue';
-const API_BASE_URL = 'http://localhost:3001';
+import { useNuxtApp } from '#app';
 
 export const usePosts = () => {
+  const { $api } = useNuxtApp();
+
   const getAllPosts = async (page = 1, limit = 6) => {
     try {
-      const allPostsResponse = await globalThis.$fetch.raw(`${API_BASE_URL}/posts?_sort=date&_order=desc`);
+      const allPostsResponse = await $api.raw(`/posts?_sort=date&_order=desc`);
       const allPosts = allPostsResponse._data;
       const totalCount = allPosts.length;
-
       const startIndex = (page - 1) * limit;
       const endIndex = startIndex + limit;
       const postsForCurrentPage = allPosts.slice(startIndex, endIndex);
@@ -21,17 +21,16 @@ export const usePosts = () => {
 
   const getPostById = async (id) => {
     try {
-      const post = await globalThis.$fetch(`${API_BASE_URL}/posts/${id}`);
+      const post = await $api(`/posts/${id}`);
       return post;
     } catch (e) {
-
-      console.error(`Failed to fetch post with ID ${id}:`, e);
+      console.error(`Не удалось получить пост с ID ${id}:`, e);
       return null;
     }
   };
 
   const createPost = async (postData) => {
-    const newPost = await globalThis.$fetch(`${API_BASE_URL}/posts`, {
+    const newPost = await $api('/posts', {
       method: 'POST',
       body: postData,
       headers: {
@@ -42,7 +41,7 @@ export const usePosts = () => {
   };
 
   const updatePost = async (id, postData) => {
-    const updatedPost = await globalThis.$fetch(`${API_BASE_URL}/posts/${id}`, {
+    const updatedPost = await $api(`/posts/${id}`, {
       method: 'PUT',
       body: postData,
       headers: {
@@ -53,7 +52,7 @@ export const usePosts = () => {
   };
 
   const deletePost = async (id) => {
-    await globalThis.$fetch(`${API_BASE_URL}/posts/${id}`, {
+    await $api(`/posts/${id}`, {
       method: 'DELETE'
     });
   };

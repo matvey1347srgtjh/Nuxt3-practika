@@ -1,14 +1,12 @@
 <template>
   <header class="app-header">
     <div class="container">
-      <NuxtLink to="/" class="app-header__logo" @click="closeMenu">
-        Тест Блог
-      </NuxtLink>
+      <NuxtLink to="/" class="app-header__logo" @click="closeMenu"> Тест Блог </NuxtLink>
 
-      <button 
-        class="app-header__burger" 
-        :class="{ 'active': menuOpen }" 
-        @click="toggleMenu" 
+      <button
+        class="app-header__burger"
+        :class="{ active: menuOpen }"
+        @click="toggleMenu"
         aria-label="Открыть/закрыть меню"
         :aria-expanded="menuOpen ? 'true' : 'false'"
         aria-controls="main-navigation-menu"
@@ -18,9 +16,9 @@
         <span class="line-bottom"></span>
       </button>
 
-      <nav 
+      <nav
         id="main-navigation-menu"
-        class="app-header__nav" 
+        class="app-header__nav"
         :class="{ 'app-header__nav--open': menuOpen }"
         @click.stop="() => {}"
       >
@@ -44,11 +42,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router'; 
-
 const menuOpen = ref(false);
-const router = useRouter(); 
+const router = useRouter();
 
 const toggleMenu = () => {
   menuOpen.value = !menuOpen.value;
@@ -77,13 +72,11 @@ onMounted(() => {
     removeRouteListener();
   });
 });
-
-
 </script>
 
 <style lang="scss" scoped>
 .app-header {
-  background-color: $success-color; 
+  background-color: $success-color;
   color: $white-color;
   padding: 1rem 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -107,12 +100,11 @@ onMounted(() => {
     font-weight: bold;
     font-size: 1.5rem;
     z-index: 20;
-    
+
     &:hover {
       opacity: 0.8;
     }
   }
-
 
   &__burger {
     display: none;
@@ -120,11 +112,11 @@ onMounted(() => {
     border: none;
     cursor: pointer;
     padding: 0.5rem;
-    position: relative; 
-    z-index: 20; 
+    position: relative;
+    z-index: 20;
     width: 30px;
     height: 24px;
-    
+
     span {
       display: block;
       width: 100%;
@@ -137,16 +129,15 @@ onMounted(() => {
     }
 
     .line-top {
-        top: 0;
+      top: 0;
     }
     .line-middle {
-        top: 50%;
-        transform: translateY(-50%);
+      top: 50%;
+      transform: translateY(-50%);
     }
     .line-bottom {
-        bottom: 0;
+      bottom: 0;
     }
-    
 
     &.active {
       .line-top {
@@ -156,11 +147,10 @@ onMounted(() => {
         opacity: 0;
       }
       .line-bottom {
-        transform: translateY(-11px) rotate(-45deg); 
+        transform: translateY(-11px) rotate(-45deg);
       }
     }
   }
-
 
   &__nav {
     ul {
@@ -168,7 +158,7 @@ onMounted(() => {
       margin: 0;
       padding: 0;
       display: flex;
-      gap: 1.5rem; 
+      gap: 1.5rem;
     }
 
     li {
@@ -180,7 +170,9 @@ onMounted(() => {
       text-decoration: none;
       font-weight: 500;
       display: inline-block;
-      transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+      transition:
+        opacity 0.2s ease-in-out,
+        transform 0.2s ease-in-out;
 
       &:hover {
         opacity: 0.8;
@@ -194,7 +186,6 @@ onMounted(() => {
   }
 }
 
-
 @media (max-width: 768px) {
   .app-header {
     .container {
@@ -204,26 +195,27 @@ onMounted(() => {
       padding: 0 1rem;
     }
 
-
     &__burger {
       display: flex;
     }
 
     &__nav {
       position: absolute;
-      top: 100%; 
+      top: 100%;
       left: 0;
       width: 100%;
       background-color: darken($success-color, 5%);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       flex-direction: column;
       align-items: center;
-      transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+      transition:
+        transform 0.3s ease-in-out,
+        opacity 0.3s ease-in-out;
       transform: translateY(-100%);
       opacity: 0;
       pointer-events: none;
-      z-index: 15; 
-      
+      z-index: 15;
+
       ul {
         flex-direction: column;
         align-items: center;

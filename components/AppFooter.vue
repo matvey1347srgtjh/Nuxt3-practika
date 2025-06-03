@@ -1,31 +1,24 @@
 <template>
   <footer class="app-footer">
     <div class="container">
-      <NuxtLink to="/" class="app-footer__logo">
-        &copy;Тест Блог
-      </NuxtLink>
+      <NuxtLink to="/" class="app-footer__logo"> &copy;Тест Блог </NuxtLink>
       <nav class="app-footer__nav">
         <ul>
-            <p>Просто футер</p>
+          <p>Просто футер</p>
         </ul>
       </nav>
     </div>
   </footer>
 </template>
 
-<script setup>
-
-</script>
+<script setup></script>
 
 <style lang="scss" scoped>
-
 .app-footer {
-  background-color: $success-color; 
+  background-color: $success-color;
   color: $white-color;
   padding: 1rem 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
- 
-
 
   .container {
     max-width: 1200px;
@@ -53,7 +46,7 @@
       margin: 0;
       padding: 0;
       display: flex;
-      gap: 1.5rem; 
+      gap: 1.5rem;
     }
 
     li {
@@ -65,13 +58,9 @@
       text-decoration: none;
       font-weight: 500;
       transition: opacity 0.2s ease-in-out;
-
-      
-      
     }
   }
 }
-
 
 @media (max-width: 768px) {
   .app-footer {

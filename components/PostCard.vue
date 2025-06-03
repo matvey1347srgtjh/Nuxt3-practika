@@ -1,7 +1,12 @@
 <template>
   <NuxtLink :to="`/posts/${post.id}`" class="post-card">
     <div class="post-card__image-wrapper">
-      <img :src="post.image || 'https://via.placeholder.com/600x400/cccccc/ffffff?text=No+Image'" :alt="post.title" class="post-card__image" loading="lazy">
+      <img
+        :src="post.image || 'https://via.placeholder.com/600x400/cccccc/ffffff?text=No+Image'"
+        :alt="post.title"
+        class="post-card__image"
+        loading="lazy"
+      />
     </div>
     <div class="post-card__content">
       <h3 class="post-card__title">{{ post.title }}</h3>
@@ -13,18 +18,15 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
-
 const props = defineProps({
   post: {
     type: Object,
     required: true,
     validator: (value) => {
       return value.id && value.title && value.date && value.excerpt;
-    },
-  },
+    }
+  }
 });
-
 
 const formatDate = (dateString) => {
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -42,8 +44,10 @@ const formatDate = (dateString) => {
   overflow: hidden;
   text-decoration: none;
   color: $text-color;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  height: 100%; 
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  height: 100%;
 
   &:hover {
     transform: translateY(-5px);
@@ -52,7 +56,7 @@ const formatDate = (dateString) => {
 
   &__image-wrapper {
     width: 100%;
-    padding-top: 66.66%; 
+    padding-top: 66.66%;
     position: relative;
     overflow: hidden;
   }
@@ -63,7 +67,7 @@ const formatDate = (dateString) => {
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; 
+    object-fit: cover;
     transition: transform 0.3s ease;
   }
 
@@ -103,7 +107,7 @@ const formatDate = (dateString) => {
     color: $success-light-color;
     font-weight: bold;
     font-size: $font-size-sm;
-    margin-top: auto; 
+    margin-top: auto;
   }
 }
 </style>
