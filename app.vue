@@ -7,21 +7,20 @@
 </template>
 
 <script setup>
-
 useHead({
   titleTemplate: (titleChunk) => {
     return titleChunk ? `${titleChunk} - Тест Блог` : 'Тест Блог';
   },
-  meta: [
-    { name: 'description', content: 'Система управления постами' }
-  ],
+  meta: [{ name: 'description', content: 'Система управления постами' }],
   link: [
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
     { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-    { href: 'https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap', rel: 'stylesheet' }
+    {
+      href: 'https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap',
+      rel: 'stylesheet'
+    }
   ]
 });
-
 </script>
 
 <style lang="scss">

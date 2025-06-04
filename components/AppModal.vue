@@ -2,21 +2,23 @@
   <ClientOnly>
     <teleport to="body">
       <Transition name="modal-fade">
-        <div v-if="modalStore.isOpen" class="app-modal-overlay" @click.self="modalStore.closeModal">
+        <div
+          v-if="dialogStore.isOpen"
+          class="app-modal-overlay"
+          @click.self="dialogStore.cancelDialog()"
+        >
           <div class="app-modal-content">
-            <div class="app-modal-header" v-if="modalStore.title">
-              <h2>{{ modalStore.title }}</h2>
-              <button class="app-modal-close" @click="modalStore.closeModal">&times;</button>
+            <div class="app-modal-header" v-if="dialogStore.modalTitle">
+              <h2>{{ dialogStore.modalTitle }}</h2>
+              <button class="app-modal-close" @click="dialogStore.cancelDialog()">&times;</button>
             </div>
             <div class="app-modal-body">
-              <component
-                :is="modalStore.component"
-                v-bind="modalStore.props"
-                @close="modalStore.closeModal"
-              />
+              <component :is="dynamicComponent" />
             </div>
-            <div class="app-modal-footer" v-if="!modalStore.title">
-              <button class="app-modal-close-footer" @click="modalStore.closeModal">Закрыть</button>
+            <div class="app-modal-footer" v-if="!dialogStore.modalTitle">
+              <button class="app-modal-close-footer" @click="dialogStore.cancelDialog()">
+                Закрыть
+              </button>
             </div>
           </div>
         </div>
@@ -26,9 +28,26 @@
 </template>
 
 <script setup>
-import { useModalStore } from '~/stores/modal';
+import { useDialogStore } from '~/stores/dialog';
 
-const modalStore = useModalStore();
+const dialogStore = useDialogStore();
+
+const dynamicComponent = computed(() => {
+  if (!dialogStore.componentName) {
+    return null;
+  }
+
+  const componentMap = {
+    DeleteModal: () => import('~/components/modals/DeleteModal.vue'),
+    CommentFormModal: () => import('~/components/modals/CommentFormModal.vue')
+  };
+
+  const componentLoader = componentMap[dialogStore.componentName];
+  if (componentLoader) {
+    return defineAsyncComponent(componentLoader);
+  }
+  return null;
+});
 </script>
 
 <style lang="scss" scoped>

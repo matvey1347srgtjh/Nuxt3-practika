@@ -1,52 +1,37 @@
 <template>
   <div class="modal-content-inner">
-    <h3 class="modal-title">{{ title }}</h3>
-    <p class="modal-message" v-html="message"></p>
+    <h3 class="modal-title">{{ dialogStore.modalData.title || 'Подтвердите действие' }}</h3>
+    <p
+      class="modal-message"
+      v-html="dialogStore.modalData.message || 'Вы уверены, что хотите продолжить?'"
+    ></p>
     <div class="modal-actions">
       <button class="button button--danger" @click="handleConfirm">
-        {{ confirmText }}
+        {{ dialogStore.modalData.confirmText || 'Подтвердить' }}
       </button>
       <button class="button button--secondary" @click="handleCancel">
-        {{ cancelText }}
+        {{ dialogStore.modalData.cancelText || 'Отмена' }}
       </button>
     </div>
   </div>
 </template>
 
 <script setup>
-const props = defineProps({
-  title: {
-    type: String,
-    default: 'Подтвердите действие'
-  },
-  message: {
-    type: String,
-    default: 'Вы уверены, что хотите продолжить?'
-  },
-  confirmText: {
-    type: String,
-    default: 'Подтвердить'
-  },
-  cancelText: {
-    type: String,
-    default: 'Отмена'
-  },
+import { useDialogStore } from '~/stores/dialog';
 
-  onConfirm: {
-    type: Function,
-    required: true
-  }
-});
+const dialogStore = useDialogStore();
 
-const emit = defineEmits(['close']);
+const onConfirmCallback = dialogStore.modalData.onConfirm;
 
 const handleConfirm = () => {
-  props.onConfirm();
-  emit('close');
+  if (onConfirmCallback) {
+    onConfirmCallback();
+  }
+  dialogStore.confirmDialog(true);
 };
 
 const handleCancel = () => {
-  emit('close');
+  dialogStore.cancelDialog(false);
 };
 </script>
 

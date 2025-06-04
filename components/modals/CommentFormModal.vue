@@ -14,56 +14,51 @@
         <button type="submit" class="button button--success" :disabled="isSubmitting">
           {{ isSubmitting ? 'Отправка...' : 'Отправить комментарий' }}
         </button>
-        <button type="button" class="button button--secondary" @click="closeModal">Отмена</button>
+        <button type="button" class="button button--secondary" @click="cancelComment">
+          Отмена
+        </button>
       </div>
     </form>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import { useComments } from '~/composables/useComments';
-import { useModalStore } from '@/stores/modal';
-
-const props = defineProps({
-  postId: {
-    type: String,
-    required: true
-  },
-  onCommentCreated: {
-    type: Function,
-    required: true
-  }
-});
+import { useDialogStore } from '~/stores/dialog';
 
 const author = ref('');
 const text = ref('');
 const isSubmitting = ref(false);
 
 const { createComment } = useComments();
-const modalStore = useModalStore();
+const dialogStore = useDialogStore();
+
+const postId = dialogStore.modalData.postId;
+const onCommentCreatedCallback = dialogStore.modalData.onCommentCreated;
 
 const submitComment = async () => {
   isSubmitting.value = true;
   try {
     const commentData = {
-      postId: props.postId,
+      postId: postId,
       author: author.value,
       text: text.value
     };
     await createComment(commentData);
-    props.onCommentCreated();
-    closeModal();
+    if (onCommentCreatedCallback) {
+      onCommentCreatedCallback();
+    }
+    dialogStore.confirmDialog(true);
   } catch (e) {
     console.error('Ошибка при отправке комментария:', e);
-    alert('Не удалось отправить комментарий. Пожалуйста, попробуйте еще раз.');
+    dialogStore.cancelDialog('Ошибка отправки комментария');
   } finally {
     isSubmitting.value = false;
   }
 };
 
-const closeModal = () => {
-  modalStore.closeModal();
+const cancelComment = () => {
+  dialogStore.cancelDialog();
 };
 </script>
 

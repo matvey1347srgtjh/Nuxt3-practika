@@ -69,13 +69,13 @@
 <script setup>
 import { usePosts } from '~/composables/usePosts';
 import { useComments } from '~/composables/useComments';
-import { useModalStore } from '@/stores/modal';
+import { useDialog } from '~/composables/useDialog';
 
 const route = useRoute();
 const router = useRouter();
 const { getPostById, deletePost } = usePosts();
 const { getCommentsByPostId } = useComments();
-const modalStore = useModalStore();
+const dialog = useDialog();
 
 const {
   data: post,
@@ -102,14 +102,16 @@ const formatDate = (dateString) => {
 
 const handleAddComment = () => {
   if (!post.value) {
+    console.warn('Пост еще не загружен');
     return;
   }
 
-  modalStore.openModal(
-    defineAsyncComponent(() => import('~/components/modals/CommentFormModal.vue')),
+  dialog.open(
+    'CommentFormModal',
     {
       postId: post.value.id,
       onCommentCreated: () => {
+        console.log('Комментарий успешно создан');
         refreshComments();
       }
     },
@@ -119,28 +121,31 @@ const handleAddComment = () => {
 
 const handleDeletePost = async () => {
   if (!post.value) {
-    console.warn(
-      'Пост еще не загружен.'
-    );
+    console.warn('Пост еще не загружен.');
     return;
   }
 
-  modalStore.openModal(
-    defineAsyncComponent(() => import('@/components/modals/DeleteModal.vue')),
-    {
-      message: `Вы уверены, что хотите безвозвратно удалить пост "${post.value.title}"? <b>Это действие нельзя отменить.</b>`,
-      onConfirm: async () => {
-        try {
-          await deletePost(post.value.id);
-          console.log(`Пост с ID ${post.value.id} успешно удален.`);
-          router.push('/posts');
-        } catch (e) {
-          alert('Произошла ошибка при удалении поста. Пожалуйста, попробуйте еще раз.');
+  try {
+    const confirmed = await dialog.open(
+      'DeleteModal',
+      {
+        message: `Вы уверены, что хотите безвозвратно удалить пост "${post.value.title}"? <b>Это действие нельзя отменить.</b>`,
+        onConfirm: async () => {
+          try {
+            await deletePost(post.value.id);
+            console.log(`Пост с ID ${post.value.id} успешно удален.`);
+            router.push('/posts');
+          } catch (e) {
+            console.error('Ошибка при удалении поста:', e);
+            alert('Произошла ошибка при удалении поста. Пожалуйста, попробуйте еще раз.');
+          }
         }
-      }
-    },
-    'Подтверждение удаления'
-  );
+      },
+      'Подтверждение удаления'
+    );
+  } catch (error) {
+    console.log('Удаление поста отменено.', error);
+  }
 };
 
 useHead(() => ({
@@ -295,6 +300,15 @@ if (process.client && post.value === null && !postPending.value && !postError.va
         background-color: darken($danger-color, 10%);
       }
     }
+    &--outline {
+      color: $success-color;
+      border: 1px solid $success-color;
+      background-color: transparent;
+      &:hover {
+        background-color: $success-color;
+        color: $white-color;
+      }
+    }
   }
 
   .post-not-found,
@@ -374,17 +388,6 @@ if (process.client && post.value === null && !postPending.value && !postError.va
 @media (max-width: 768px) {
   .add-comment-action {
     text-align: center;
-  }
-}
-
-
-.button--outline {
-  color: $success-color;
-  border: 1px solid $success-color;
-  background-color: transparent;
-  &:hover {
-    background-color: $success-color;
-    color: $white-color;
   }
 }
 </style>
