@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import { ref, shallowRef } from 'vue';
 
 export const useDialogStore = defineStore('dialog', () => {
   const componentName = ref(null);
