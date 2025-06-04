@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-=======
-import { defineStore } from 'pinia';
-
->>>>>>> 4e0fe6ecfbe5ab5e53649948347a81fe1ae6a67c
 export const useDialogStore = defineStore('dialog', () => {
   const componentName = ref(null);
   const modalData = shallowRef({});
